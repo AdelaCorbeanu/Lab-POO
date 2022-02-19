@@ -82,6 +82,7 @@ int main() {
         else {
             cout << total_gem << " " << total_frisca << '\n';
         }
+
         cin >> comanda;
     }
     return 0;
