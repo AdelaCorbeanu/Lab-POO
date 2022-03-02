@@ -1,89 +1,101 @@
 #include <iostream>
-#include <cstring>
+#include <vector>
+
 using namespace std;
 
-double gem[100], frisca[100], total_gem, total_frisca;
-char comanda[50], forma[50];
+class Polinom {
+private:
+    vector<double> v;
+    int nr_elem;
 
-struct cerc {
-    int raza;
+public:
+    Polinom ();
+    Polinom (Polinom &x);
+    Polinom (vector<double> &x);
+    ~Polinom ();
+    double valoare (const double &x);
+    Polinom operator+(Polinom a);
+    Polinom operator-(Polinom a);
+    Polinom operator*(Polinom a);
 };
 
-struct dreptunghi {
-    int L, l;
-};
+Polinom :: Polinom() {
+    nr_elem = 0;
+}
 
-struct patrat {
-    int latura;
-};
+Polinom :: Polinom (Polinom &x) {
+    nr_elem = x.nr_elem;
+    v = x.v;
+}
 
-struct triunghi {
-    int C, c;
-};
+Polinom :: Polinom (vector<double> &x) {
+    nr_elem = x.size();
+    v = x;
+}
 
-int main() {
-    int h;
-    int index_forma = 0;
+Polinom :: ~Polinom () {
+    nr_elem = 0;
+    v.clear();
+}
 
-    cin >> comanda;
-    while (strcmp(comanda, "STOP")) {
-
-        double arie_baza, volum;          //frisca, gem
-        int index_remove;
-
-        if (!strcmp(comanda, "ADD")) {
-            cin >> forma;
-
-            if (!strcmp(forma, "cerc")) {
-                cerc x;
-                cin >> x.raza;
-                cin >> h;
-                arie_baza = 3.14 * x.raza * x.raza;
-            }
-
-            else if (!strcmp(forma, "dreptunghi")) {
-                dreptunghi x;
-                cin >> x.L >> x.l;
-                arie_baza = x.L * x.l;
-            }
-
-            else if (!strcmp(forma, "patrat")) {
-                patrat x;
-                cin >> x.latura;
-                arie_baza = x.latura * x.latura;
-            }
-
-            else {
-                triunghi x;
-                cin >> x.C >> x.c;
-                arie_baza = double(x.C * x.c) / 2;
-            }
-
-            index_forma ++;
-            volum = arie_baza * h;
-            cout << volum << " " << arie_baza << '\n';
-            gem[index_forma] = volum;
-            frisca[index_forma] = arie_baza;
-            total_gem += volum;
-            total_frisca += arie_baza;
-        }
-
-        else if (!strcmp(comanda, "REMOVE")) {
-            cin >> index_remove;
-            total_gem -= gem[index_remove];
-            total_frisca -= frisca[index_remove];
-            for (int i = index_remove; i < index_forma; ++ i) {
-                frisca[i] = frisca[i + 1];
-                gem[i] = gem[i + 1];
-            }
-            index_forma --;
-        }
-
-        else {
-            cout << total_gem << " " << total_frisca << '\n';
-        }
-
-        cin >> comanda;
+double Polinom :: valoare (const double &x) {
+    double p = 1, rez = 0;
+    for (auto it : v) {
+        rez += p * it;
+        p = p * x;
     }
+    return rez;
+}
+
+Polinom Polinom :: operator+(Polinom a) {
+    Polinom rez;
+    if (this->v.size() > a.v.size()) {
+        int n = this->v.size() - a.v.size();
+        for (int i = 0; i < n; ++i) rez.v.push_back(this->v[i]);
+        for (unsigned int i = 0; i < a.v.size(); ++i)
+            rez.v.push_back(this->v[n + i] + a.v[i]);
+    }
+    else {
+        int n = a.v.size() - this->v.size();
+        for (int i = 0; i < n; ++i) rez.v.push_back(a.v[i]);
+        for (unsigned int i = 0; i < this->v.size(); ++i)
+            rez.v.push_back(this->v[i] + a.v[n + i]);
+    }
+    return rez;
+}
+
+Polinom Polinom :: operator-(Polinom a) {
+    Polinom rez;
+    if (this->v.size() > a.v.size()) {
+         int n = this->v.size() - a.v.size();
+         for (int i = 0; i < n; ++i) rez.v.push_back(this->v[i]);
+         for (unsigned int i = 0; i < a.v.size(); ++i) rez.v.push_back(this->v[n + i] - a.v[i]);
+    }
+    else {
+         int n = a.v.size() - this->v.size();
+         for (int i = 0; i < n; ++i) rez.v.push_back(-a.v[i]);
+         for (unsigned int i = 0; i < this->v.size(); ++i) rez.v.push_back(this->v[i] - a.v[n + i]);
+    }
+    return rez;
+}
+
+Polinom Polinom :: operator*(Polinom a) {
+    int n = this->v.size();
+    int m = a.v.size();
+    vector<double> aux(n + m - 1, 0);
+    Polinom rez(aux);
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < m; ++j)
+            rez.v[i + j] += this->v[i] * a.v[j];
+    return rez;
+}
+
+int main()
+{
+    vector<double> a = {5,6,7,8,-9,10};
+    Polinom ob;
+    a = {2,3,4};
+    Polinom ob2(a);
+    Polinom ob3 = ob+ob2;
     return 0;
 }
