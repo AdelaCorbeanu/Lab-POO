@@ -11,12 +11,20 @@ private:
 public:
     Polinom ();
     Polinom (Polinom &x);
-    Polinom (vector<double> &x);
+    explicit Polinom (vector<double> &x);
     ~Polinom ();
-    double valoare (const double &x);
+
+    double valoare (const double &x);     //valoarea polinomului in x
+
     Polinom operator+(Polinom a);
     Polinom operator-(Polinom a);
     Polinom operator*(Polinom a);
+
+    void setPolinom (vector<double> v);
+    vector<double> getPolinom();
+
+    friend ostream &operator<<(ostream &os, const Polinom &ob);
+    friend istream &operator>>(istream &is, Polinom &ob);
 };
 
 Polinom :: Polinom() {
@@ -29,7 +37,7 @@ Polinom :: Polinom (Polinom &x) {
 }
 
 Polinom :: Polinom (vector<double> &x) {
-    nr_elem = x.size();
+    nr_elem = (int)x.size();
     v = x;
 }
 
@@ -50,13 +58,13 @@ double Polinom :: valoare (const double &x) {
 Polinom Polinom :: operator+(Polinom a) {
     Polinom rez;
     if (this->v.size() > a.v.size()) {
-        int n = this->v.size() - a.v.size();
+        int n = (int)this->v.size() - (int)a.v.size();
         for (int i = 0; i < n; ++i) rez.v.push_back(this->v[i]);
         for (unsigned int i = 0; i < a.v.size(); ++i)
             rez.v.push_back(this->v[n + i] + a.v[i]);
     }
     else {
-        int n = a.v.size() - this->v.size();
+        int n = (int)a.v.size() - (int)this->v.size();
         for (int i = 0; i < n; ++i) rez.v.push_back(a.v[i]);
         for (unsigned int i = 0; i < this->v.size(); ++i)
             rez.v.push_back(this->v[i] + a.v[n + i]);
@@ -67,21 +75,24 @@ Polinom Polinom :: operator+(Polinom a) {
 Polinom Polinom :: operator-(Polinom a) {
     Polinom rez;
     if (this->v.size() > a.v.size()) {
-         int n = this->v.size() - a.v.size();
+         int n = (int)this->v.size() - (int)a.v.size();
          for (int i = 0; i < n; ++i) rez.v.push_back(this->v[i]);
          for (unsigned int i = 0; i < a.v.size(); ++i) rez.v.push_back(this->v[n + i] - a.v[i]);
     }
     else {
-         int n = a.v.size() - this->v.size();
+         int n = (int)a.v.size() - (int)this->v.size();
          for (int i = 0; i < n; ++i) rez.v.push_back(-a.v[i]);
-         for (unsigned int i = 0; i < this->v.size(); ++i) rez.v.push_back(this->v[i] - a.v[n + i]);
+         for (unsigned int i = 0; i < this->v.size(); ++i) {
+             double x = this->v[i] - a.v[n + i];
+             if (x) rez.v.push_back(this->v[i] - a.v[n + i]);
+         }
     }
     return rez;
 }
 
 Polinom Polinom :: operator*(Polinom a) {
-    int n = this->v.size();
-    int m = a.v.size();
+    int n = (int)this->v.size();
+    int m = (int)a.v.size();
     vector<double> aux(n + m - 1, 0);
     Polinom rez(aux);
     for (int i = 0; i < n; ++i)
@@ -90,12 +101,62 @@ Polinom Polinom :: operator*(Polinom a) {
     return rez;
 }
 
+ostream &operator<<(ostream &os, const Polinom &ob) {
+    auto putere = ob.v.size() - 1;
+    int gol = true;
+    os << "Polinomul este: ";
+    for (double i : ob.v) {
+        if (i) {
+            if (!gol && i > 0) os << '+';
+            gol = false;
+            if (i == 1 && putere) os << "X";
+            else if (i == -1 && putere) os << "-X";
+            else {
+                os << i;
+                if (putere) os << "*X";
+            }
+            if (putere > 1) os << '^' << putere;
+        }
+        putere--;
+    }
+    os << '\n';
+    return os;
+}
+
+istream &operator>>(istream &is, Polinom &ob) {
+    cout << "Numarul de coeficienti este: ";
+    is >> ob.nr_elem;
+    double x;
+    ob.v.clear();
+    cout << "Coeficientii sunt: ";
+    for (int i = 0; i < ob.nr_elem; ++i) {
+        cin >> x;
+        ob.v.push_back(x);
+    }
+    return is;
+}
+
+void Polinom :: setPolinom (vector<double> v) {
+    this->v = v;
+}
+
+vector<double> Polinom :: getPolinom() {
+    return this->v;
+}
+
 int main()
 {
     vector<double> a = {5,6,7,8,-9,10};
-    Polinom ob;
-    a = {2,3,4};
+    Polinom ob(a);
+    a = {2,3,3};
     Polinom ob2(a);
-    Polinom ob3 = ob+ob2;
+    a = {2,1,1};
+    Polinom ob3;
+    ob3.setPolinom(a);
+    ob2.setPolinom(ob3.getPolinom());
+    a = {1};
+    ob3.setPolinom(a);
+    cin >> ob2;
+    cout << ob2;
     return 0;
 }
