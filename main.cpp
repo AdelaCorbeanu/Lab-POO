@@ -75,17 +75,17 @@ Polinom Polinom :: operator+(Polinom a) {
 Polinom Polinom :: operator-(Polinom a) {
     Polinom rez;
     if (this->v.size() > a.v.size()) {
-         int n = (int)this->v.size() - (int)a.v.size();
-         for (int i = 0; i < n; ++i) rez.v.push_back(this->v[i]);
-         for (unsigned int i = 0; i < a.v.size(); ++i) rez.v.push_back(this->v[n + i] - a.v[i]);
+        int n = (int)this->v.size() - (int)a.v.size();
+        for (int i = 0; i < n; ++i) rez.v.push_back(this->v[i]);
+        for (unsigned int i = 0; i < a.v.size(); ++i) rez.v.push_back(this->v[n + i] - a.v[i]);
     }
     else {
-         int n = (int)a.v.size() - (int)this->v.size();
-         for (int i = 0; i < n; ++i) rez.v.push_back(-a.v[i]);
-         for (unsigned int i = 0; i < this->v.size(); ++i) {
-             double x = this->v[i] - a.v[n + i];
-             if (x) rez.v.push_back(this->v[i] - a.v[n + i]);
-         }
+        int n = (int)a.v.size() - (int)this->v.size();
+        for (int i = 0; i < n; ++i) rez.v.push_back(-a.v[i]);
+        for (unsigned int i = 0; i < this->v.size(); ++i) {
+            double x = this->v[i] - a.v[n + i];
+            if (x) rez.v.push_back(this->v[i] - a.v[n + i]);
+        }
     }
     return rez;
 }
@@ -146,17 +146,67 @@ vector<double> Polinom :: getPolinom() {
 
 int main()
 {
-    vector<double> a = {5,6,7,8,-9,10};
-    Polinom ob(a);
-    a = {2,3,3};
-    Polinom ob2(a);
-    a = {2,1,1};
-    Polinom ob3;
-    ob3.setPolinom(a);
-    ob2.setPolinom(ob3.getPolinom());
-    a = {1};
-    ob3.setPolinom(a);
-    cin >> ob2;
-    cout << ob2;
+    while (true) {
+        cout << "Introduceti comanda dorita ('LISTA' pentru lista de comenzi)" << '\n';
+        string comanda;
+        cin >> comanda;
+        if (comanda == "LISTA") {
+            cout << "EVAL - Calculeaza valoarea unui polinom intr-un punct" << '\n';
+            cout << "ADD - Aduna doua polinoame" << '\n';
+            cout << "SUB - Diferenta a doua polinoame" << '\n';
+            cout << "MUL - Produsul a doua polinoame" << '\n';
+            cout << "EXIT - Termina programul" << '\n';
+            continue;
+        }
+        if (comanda == "EVAL") {
+            cout << "Gradul polinomului este: ";
+            int grad;
+            cin >> grad;
+            vector<double> v;
+            cout << "Coeficientii lui P(X) sunt: ";
+            for (int i = 0; i <= grad; ++i) {
+                double x;
+                cin >> x;
+                v.push_back(x);
+            }
+            Polinom P(v);
+            cout << "X = ";
+            double x;
+            cin >> x;
+            cout << P.valoare(x) << '\n';
+            continue;
+        }
+        if (comanda == "ADD" || comanda == "SUB" || comanda == "MUL") {
+            cout << "Gradul primului polinom este: ";
+            int grad;
+            cin >> grad;
+            vector<double> v;
+            cout << "Coeficientii lui P1(X) sunt: ";
+            for (int i = 0; i <= grad; ++i) {
+                double x;
+                cin >> x;
+                v.push_back(x);
+            }
+            Polinom P1(v);
+            v.clear();
+
+            cout << "Gradul celui de-al doilea polinom este: ";
+            cin >> grad;
+            cout << "Coeficientii lui P2(X) sunt: ";
+            for (int i = 0; i <= grad; ++i) {
+                double x;
+                cin >> x;
+                v.push_back(x);
+            }
+            Polinom P2(v);
+            Polinom rez;
+            if (comanda == "ADD") rez = P1 + P2;
+            else if (comanda == "SUB") rez = P1 - P2;
+            else rez = P1 * P2;
+            cout << rez << '\n';
+            continue;
+        }
+        if (comanda == "EXIT") break;
+    }
     return 0;
 }
